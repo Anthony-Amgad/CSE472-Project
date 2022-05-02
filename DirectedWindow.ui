@@ -135,7 +135,7 @@
    <widget class="QPushButton" name="adEdgeBtn">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>960</x>
       <y>80</y>
       <width>111</width>
       <height>28</height>
@@ -232,7 +232,7 @@
    <widget class="QComboBox" name="startNodeCom">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>170</x>
       <y>180</y>
       <width>301</width>
       <height>22</height>
@@ -245,26 +245,10 @@
      <string>Pick a Starting Node</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="goalNodeCom">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>180</y>
-      <width>301</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="editable">
-     <bool>true</bool>
-    </property>
-    <property name="placeholderText">
-     <string>Pick a Goal Node</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="searchAlgoCom">
     <property name="geometry">
      <rect>
-      <x>660</x>
+      <x>480</x>
       <y>180</y>
       <width>301</width>
       <height>22</height>
@@ -280,7 +264,7 @@
    <widget class="QPushButton" name="searchBtn">
     <property name="geometry">
      <rect>
-      <x>980</x>
+      <x>800</x>
       <y>180</y>
       <width>121</width>
       <height>28</height>
@@ -311,6 +295,19 @@
     </property>
     <property name="text">
      <string>Next</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>80</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Goal Node</string>
     </property>
    </widget>
   </widget>
