@@ -7,6 +7,7 @@ class DGUi(QtWidgets.QMainWindow):
         super(DGUi,self).__init__()
         uic.loadUi('DirectedWindow.ui',self)
 
+        self.setFixedSize(1112, 858)
         
         self.graphBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.graphBrowser.setGeometry(QtCore.QRect(0, 220, 551, 601))
@@ -21,9 +22,7 @@ class DGUi(QtWidgets.QMainWindow):
         self.nextBtn = QtWidgets.QPushButton(self.centralwidget)
         self.nextBtn.setGeometry(QtCore.QRect(1050, 230, 51, 31))
         self.nextBtn.setObjectName("nextBtn")
-        self.nextBtn.setText("Next")
-
-        
+        self.nextBtn.setText("Next")    
 
         self.fromEdAddCom.lineEdit().setPlaceholderText("From")
         self.toEdAddCom.lineEdit().setPlaceholderText("To")

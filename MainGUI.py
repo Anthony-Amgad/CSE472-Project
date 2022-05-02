@@ -12,6 +12,8 @@ class MUi(QtWidgets.QMainWindow):
         super(MUi,self).__init__()
         uic.loadUi('MainWindow.ui',self)
 
+        self.setFixedSize(804, 156)
+
         self.dirPushBut.clicked.connect(self.openDirectedWindow)
 
         self.show()
