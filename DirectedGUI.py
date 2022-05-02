@@ -1,10 +1,29 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore
 import sys
+import os.path
 
 class DGUi(QtWidgets.QMainWindow):
     def __init__(self):
         super(DGUi,self).__init__()
         uic.loadUi('DirectedWindow.ui',self)
+
+        
+        self.graphBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
+        self.graphBrowser.setGeometry(QtCore.QRect(0, 220, 551, 601))
+        self.graphBrowser.setObjectName("graphBrowseri")
+        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("test.html")))
+
+        self.treeBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
+        self.treeBrowser.setGeometry(QtCore.QRect(560, 220, 551, 601))
+        self.treeBrowser.setObjectName("treeBrowser")
+        self.treeBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("test.html")))
+
+        self.nextBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.nextBtn.setGeometry(QtCore.QRect(1050, 230, 51, 31))
+        self.nextBtn.setObjectName("nextBtn")
+        self.nextBtn.setText("Next")
+
+        
 
         self.fromEdAddCom.lineEdit().setPlaceholderText("From")
         self.toEdAddCom.lineEdit().setPlaceholderText("To")

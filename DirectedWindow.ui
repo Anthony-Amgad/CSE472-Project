@@ -25,16 +25,6 @@
    <string>Directed Graph</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTextBrowser" name="graphBrowser">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>220</y>
-      <width>551</width>
-      <height>601</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="nodeNameTxt">
     <property name="geometry">
      <rect>
@@ -272,29 +262,6 @@
     </property>
     <property name="text">
      <string>Search</string>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="treeBrowser">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>220</y>
-      <width>551</width>
-      <height>601</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="nextBtn">
-    <property name="geometry">
-     <rect>
-      <x>1050</x>
-      <y>230</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Next</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
