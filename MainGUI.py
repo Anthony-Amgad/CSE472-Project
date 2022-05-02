@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtGui
 import sys
 
 from DirectedGUI import DGUi
@@ -13,6 +13,8 @@ class MUi(QtWidgets.QMainWindow):
         uic.loadUi('MainWindow.ui',self)
 
         self.setFixedSize(804, 156)
+
+        self.setWindowIcon(QtGui.QIcon('img.png'))
 
         self.dirPushBut.clicked.connect(self.openDirectedWindow)
 

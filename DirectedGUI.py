@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore
+from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore, QtGui
 import sys
 import os.path
 
@@ -6,6 +6,9 @@ class DGUi(QtWidgets.QMainWindow):
     def __init__(self):
         super(DGUi,self).__init__()
         uic.loadUi('DirectedWindow.ui',self)
+
+        self.setWindowIcon(QtGui.QIcon('img.png'))
+
 
         self.setFixedSize(1112, 858)
         
