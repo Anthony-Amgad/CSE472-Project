@@ -9,17 +9,16 @@ class TreePlot:
 
         for n in treeNodes:
             
-            G.add_node(n["name"], n["name"] + " ( H:" + str(n["Hs"]) + " G:" + str(n["Gs"]) + " )", shape="ellipse")
+            G.add_node(n["name"]+":"+str(n["Gs"]), n["name"] + " ( G:" + str(n["Gs"]) + " H:" + str(n["Hs"]) + " )", shape="ellipse")
             if n["parent"] != None:
-                pn,pg = n["parent"].split(":")
-                G.add_edge(pn, n["name"])
+                G.add_edge(n["parent"], n["name"]+":"+str(n["Gs"]))
 
         for n in expanded:
-            nn,ng = n.split(":")
-            G.get_node(nn)["color"] = 'lime'
+            G.get_node(n)["color"] = 'lime'
+            
 
         if found:
-            G.get_node(expanded[-1].split(":")[0])["color"] = 'yellow'
+            G.get_node(expanded[-1])["color"] = 'yellow'
 
         G.save_graph("tree.html")
 

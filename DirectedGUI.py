@@ -224,7 +224,7 @@ class DGUi(QtWidgets.QMainWindow):
                         while pp != None:
                             ppn, ppg = pp.split(":")
                             path.append(ppn)
-                            pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == int(ppg))))["parent"]
+                            pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
                         st = ""
                         path.reverse()
                         for p in path:
@@ -244,7 +244,7 @@ class DGUi(QtWidgets.QMainWindow):
                     else:
                         for child in self.AdjLi[pn]:
                             eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
-                            gS = min(eL, key=lambda x:x['cost'])['cost'] + int(pg)
+                            gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                             hS = next(x for x in self.Nodes if x["name"] == child)['heur']
                             if (child + ":" + str(gS)) not in self.expanded:
                                 self.fringe.append(str(child + ":" + str(gS)))
