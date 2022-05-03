@@ -187,7 +187,7 @@ class DGUi(QtWidgets.QMainWindow):
                     self.delNodeBtn.setDisabled(True)
                     self.delEdgeBtn.setDisabled(True)
                     self.searchBtn.setDisabled(True)
-                    self.onClickNext()
+                    self.reTree(False)
                 case 1: #DFS
                     print("DFS")
                 case 2: #IDS

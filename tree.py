@@ -10,7 +10,7 @@ class TreePlot:
 
         for n in treeNodes:
             
-            G.add_node(n["name"], n["name"] + " H:" + str(n["Hs"]) + " G:" + str(n["Gs"]), shape="ellipse")
+            G.add_node(n["name"], n["name"] + " ( H:" + str(n["Hs"]) + " G:" + str(n["Gs"]) + " )", shape="ellipse")
             if n["parent"] != NULL:
                 G.add_edge(n["parent"], n["name"])
 
