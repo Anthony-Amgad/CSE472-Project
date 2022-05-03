@@ -2,10 +2,15 @@ from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore, QtGui
 import sys
 import os.path
 
+from plot import Plot
+
 class DGUi(QtWidgets.QMainWindow):
 
     Nodes = []
     Edges = []
+
+    def reGraph(self):
+        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("Dir.html")))
     
     def addNode(self):
         try:
@@ -31,6 +36,8 @@ class DGUi(QtWidgets.QMainWindow):
                     nH = 0
                 else:
                     nH = float(nH)
+                if nH < 0:
+                    raise Exception("No Negative Numbers")
                 nG = self.checkBox.isChecked()
                 nN = self.nodeNameTxt.text()
                 self.Nodes.append({"name":nN, "heur":nH, "goal":nG})
@@ -43,6 +50,9 @@ class DGUi(QtWidgets.QMainWindow):
                 self.checkBox.setCheckState(False)
                 if not nG:
                     self.startNodeCom.addItem(nN)
+                Plot.plotDir(self.Nodes,self.Edges)
+                self.reGraph()
+
 
         except:
             msg = QtWidgets.QMessageBox()
@@ -70,11 +80,15 @@ class DGUi(QtWidgets.QMainWindow):
                     eC = 0
                 else:
                     eC = float(eC)
-                self.Edges.append({"from":self.fromEdAddCom.currentIndex(),"to":self.toEdAddCom.currentIndex(),"cost":eC})
+                if eC < 0:
+                    raise Exception("No Negative Numbers")
+                self.Edges.append({"from":self.fromEdAddCom.currentText(),"to":self.toEdAddCom.currentText(),"cost":eC})
                 self.delEdCom.addItem(self.fromEdAddCom.currentText() + " > " + self.toEdAddCom.currentText() + " : " + str(eC))
                 self.fromEdAddCom.setCurrentIndex(-1)
                 self.toEdAddCom.setCurrentIndex(-1)
                 self.edPathCTxt.setText("")
+                Plot.plotDir(self.Nodes,self.Edges)
+                self.reGraph()
 
         except:
             msg = QtWidgets.QMessageBox()
@@ -106,7 +120,6 @@ class DGUi(QtWidgets.QMainWindow):
         self.graphBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.graphBrowser.setGeometry(QtCore.QRect(0, 220, 551, 601))
         self.graphBrowser.setObjectName("graphBrowseri")
-        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("test.html")))
 
         self.treeBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.treeBrowser.setGeometry(QtCore.QRect(560, 220, 551, 601))
