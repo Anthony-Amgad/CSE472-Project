@@ -109,6 +109,18 @@ class DGUi(QtWidgets.QMainWindow):
             nE = list(filter(lambda edge: edge['to'] != self.delNodeCom.currentText(), nE))
             self.Edges = nE
             self.Nodes = nL
+            fC = [self.fromEdAddCom.itemText(i) for i in range(self.fromEdAddCom.count())]
+            for i in range(0,len(fC)):
+                if fC[i] == self.delNodeCom.currentText():
+                    self.fromEdAddCom.removeItem(i)
+            tC = [self.toEdAddCom.itemText(i) for i in range(self.toEdAddCom.count())]
+            for i in range(0,len(tC)):
+                if tC[i] == self.delNodeCom.currentText():
+                    self.toEdAddCom.removeItem(i)
+            sC = [self.startNodeCom.itemText(i) for i in range(self.startNodeCom.count())]
+            for i in range(0,len(sC)):
+                if sC[i] == self.delNodeCom.currentText():
+                    self.startNodeCom.removeItem(i)
             self.delNodeCom.removeItem(self.delNodeCom.currentIndex())
             Plot.plotDir(self.Nodes,self.Edges)
             self.reGraph()
@@ -118,6 +130,30 @@ class DGUi(QtWidgets.QMainWindow):
                 ngg = list(filter(lambda node: node['goal'], self.Nodes))
                 if (len(ngg) == len(self.Nodes)) or (len(ngg) < 1):
                     self.searchBtn.setDisabled(True)
+            dEc = [self.delEdCom.itemText(i) for i in range(self.delEdCom.count())]
+            for i in range(0,len(dEc)):
+                Ef, Et = dEc[i].split('>')
+                Ef.strip()
+                Et, Ec = Et.split(':')
+                Et.strip()
+                Ec = float(Ec)
+                if next((edge for edge in self.Edges if ((edge['from'] == Ef) or (edge['to'] == Et))), None)  == None:
+                    self.delEdCom.removeItem(i)            
+            self.delNodeCom.setCurrentIndex(-1)   
+
+    def delEdge(self):
+        if self.delEdCom.currentIndex() != -1:
+            Ef, Et = self.delEdCom.currentText().split('>')
+            Ef.strip()
+            Et, Ec = Et.split(':')
+            Et.strip()
+            Ec = float(Ec)
+            nE = list(filter(lambda edge: (edge['from'] != Ef) and (edge['to'] != Et) and (edge['cost'] != Ec), self.Edges))
+            self.Edges = nE
+            self.delEdCom.removeItem(self.delEdCom.currentIndex())
+            Plot.plotDir(self.Nodes,self.Edges)
+            self.reGraph()
+            self.delEdCom.setCurrentIndex(-1)
             
     def checkBoxClick(self):
         if self.checkBox.isChecked():
@@ -170,6 +206,7 @@ class DGUi(QtWidgets.QMainWindow):
         self.adEdgeBtn.clicked.connect(self.addEdge)
         self.checkBox.clicked.connect(self.checkBoxClick)
         self.delNodeBtn.clicked.connect(self.delNode)
+        self.delEdgeBtn.clicked.connect(self.delEdge)
 
         self.show()
 
