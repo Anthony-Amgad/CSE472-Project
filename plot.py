@@ -3,8 +3,8 @@ from pyvis.network import Network
 
 class Plot:
 
-    def plotDir(Nodes,Edges):
-        G = Network(height='100%', width='100%', directed=True)
+    def plot(Nodes, Edges, bool):
+        G = Network(height='100%', width='100%', directed=bool)
 
         G.set_options("""var options = {
                   "edges": {
@@ -35,6 +35,10 @@ class Plot:
         for e in Edges:
             G.add_edge(e["from"], e["to"], label = e["cost"])
 
-        G.save_graph("Dir.html")
+        G.save_graph("plot.html")
+
+    def plotDir(Nodes,Edges):
+        Plot.plot(Nodes, Edges, True)
+        
 
 
