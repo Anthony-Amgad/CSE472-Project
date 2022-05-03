@@ -1,17 +1,30 @@
+from asyncio.windows_events import NULL
 from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore, QtGui
 import sys
 import os.path
 
 from graph import GraphPlot
+from tree import TreePlot
+
 
 class DGUi(QtWidgets.QMainWindow):
 
     Nodes = []
     Edges = []
+    visited = []
+    fringe = []
+    expanded = []
+    treeNodes = []
+    AdjLi = {}
+    choice = NULL
 
     def reGraph(self):
-        GraphPlot.plotDir(self.Nodes,self.Edges)
+        self.AdjLi = GraphPlot.plotDir(self.Nodes,self.Edges)
         self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("graph.html")))
+
+    def reTree(self, found):
+        TreePlot.plot(self.treeNodes, self.expanded, found)
+        self.treeBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("tree.html")))
     
     def addNode(self):
         try:
@@ -160,6 +173,49 @@ class DGUi(QtWidgets.QMainWindow):
             self.nodeHuerTxt.setDisabled(False)
             self.nodeHuerTxt.setText("")
 
+
+    def onClickSearch(self):
+        if (self.startNodeCom.currentIndex() != -1) and (self.searchAlgoCom.currentIndex() != -1):
+            self.fringe.append(self.startNodeCom.currentText())
+            self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : NULL, "Gs" : 0, "Hs" : next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"], "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
+            self.choice = self.searchAlgoCom.currentIndex()
+            match self.choice:
+                case 0:
+                    self.nextBtn.setDisabled(False)
+                    self.onClickNext()
+                case 1:
+                    print("DFS")
+                case 2:
+                    print("IDS")
+                case 3:
+                    print("UCS")
+                case 4:
+                    print("GS")
+                case 5:
+                    print("AS")
+
+    def onClickNext(self):
+        match self.choice:
+            case 0:
+                parent = self.fringe.pop(0)
+                self.expanded.append(parent)
+                if next(x for x in self.Nodes if x["name"] == parent)["goal"]:
+                    self.reTree(True)
+                    self.nextBtn.setDisabled(True)
+                    self.fringe.clear()
+                    self.expanded.clear()
+                    self.treeNodes.clear()
+                else:
+                    for child in self.AdjLi[parent]:
+                        if next((x for x in self.treeNodes if x["name"] == child), None) == None:
+                            self.fringe.append(child)
+                            eL = list(filter(lambda edge: (edge['from'] == parent) and (edge['to'] == child), self.Edges))
+                            gS = min(eL, key=lambda x:x['cost'])['cost'] + next(x for x in self.treeNodes if x["name"] == parent)['Gs']
+                            self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":next(x for x in self.Nodes if x["name"] == child)['heur'], "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                    self.reTree(False)   
+                       
+
+
     
     def __init__(self):
         super(DGUi,self).__init__()
@@ -205,6 +261,8 @@ class DGUi(QtWidgets.QMainWindow):
         self.checkBox.clicked.connect(self.checkBoxClick)
         self.delNodeBtn.clicked.connect(self.delNode)
         self.delEdgeBtn.clicked.connect(self.delEdge)
+        self.searchBtn.clicked.connect(self.onClickSearch)
+        self.nextBtn.clicked.connect(self.onClickNext)
 
         self.show()
 

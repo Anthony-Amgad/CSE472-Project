@@ -50,13 +50,54 @@
         
 
         // parsing and collecting nodes and edges from the python
-        nodes = new vis.DataSet([{"id": "a", "label": "a : 0", "shape": "ellipse"}, {"id": "b", "label": "b : 0", "shape": "ellipse"}, {"color": "yellow", "id": "c", "label": "c : 0.0", "shape": "ellipse"}]);
-        edges = new vis.DataSet([{"arrows": "to", "from": "a", "label": 0, "to": "b"}, {"arrows": "to", "from": "a", "label": 0, "to": "c"}]);
+        nodes = new vis.DataSet([{"color": "lime", "id": "a", "label": "a H:0 G:0", "shape": "ellipse"}, {"color": "yellow", "id": "c", "label": "c H:0.0 G:0", "shape": "ellipse"}, {"id": "b", "label": "b H:0 G:0", "shape": "ellipse"}]);
+        edges = new vis.DataSet([{"from": "a", "to": "c"}, {"from": "a", "to": "b"}]);
 
         // adding nodes and edges to the graph
         data = {nodes: nodes, edges: edges};
 
-        var options = {"edges": {"smooth": {"enabled": true}, "color": {"inherit": false}}, "interaction": {"hover": true, "keyboard": {"enabled": true}, "multiselect": true, "navigationButtons": true}};
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "layout": {
+        "hierarchical": {
+            "blockShifting": true,
+            "edgeMinimization": true,
+            "enabled": true,
+            "levelSeparation": 150,
+            "parentCentralization": true,
+            "sortMethod": "hubsize",
+            "treeSpacing": 200
+        },
+        "improvedLayout": true,
+        "randomSeed": 0
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
         
         
 
