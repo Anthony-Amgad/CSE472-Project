@@ -10,6 +10,7 @@ class DGUi(QtWidgets.QMainWindow):
     Edges = []
 
     def reGraph(self):
+        Plot.plotDir(self.Nodes,self.Edges)
         self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("plot.html")))
     
     def addNode(self):
@@ -50,7 +51,6 @@ class DGUi(QtWidgets.QMainWindow):
                 self.checkBox.setCheckState(False)
                 if not nG:
                     self.startNodeCom.addItem(nN)
-                Plot.plotDir(self.Nodes,self.Edges)
                 self.reGraph()
                 if len(self.Nodes) >= 2:
                     ngg = list(filter(lambda node: node['goal'], self.Nodes))
@@ -90,7 +90,6 @@ class DGUi(QtWidgets.QMainWindow):
                 self.fromEdAddCom.setCurrentIndex(-1)
                 self.toEdAddCom.setCurrentIndex(-1)
                 self.edPathCTxt.setText("")
-                Plot.plotDir(self.Nodes,self.Edges)
                 self.reGraph()
 
         except:
@@ -122,7 +121,6 @@ class DGUi(QtWidgets.QMainWindow):
                 if sC[i] == self.delNodeCom.currentText():
                     self.startNodeCom.removeItem(i)
             self.delNodeCom.removeItem(self.delNodeCom.currentIndex())
-            Plot.plotDir(self.Nodes,self.Edges)
             self.reGraph()
             if len(self.Nodes) < 2:    
                 self.searchBtn.setDisabled(True)
@@ -151,7 +149,6 @@ class DGUi(QtWidgets.QMainWindow):
             nE = list(filter(lambda edge: (edge['from'] != Ef) and (edge['to'] != Et) and (edge['cost'] != Ec), self.Edges))
             self.Edges = nE
             self.delEdCom.removeItem(self.delEdCom.currentIndex())
-            Plot.plotDir(self.Nodes,self.Edges)
             self.reGraph()
             self.delEdCom.setCurrentIndex(-1)
             
@@ -175,7 +172,8 @@ class DGUi(QtWidgets.QMainWindow):
         
         self.graphBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.graphBrowser.setGeometry(QtCore.QRect(0, 220, 551, 601))
-        self.graphBrowser.setObjectName("graphBrowseri")
+        self.graphBrowser.setObjectName("graphBrowser")
+        self.reGraph()
 
         self.treeBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.treeBrowser.setGeometry(QtCore.QRect(560, 220, 551, 601))
@@ -211,8 +209,8 @@ class DGUi(QtWidgets.QMainWindow):
         self.show()
 
         ##This is for finding functions using auto complete as they cannot be found with the item loaded in the .ui
-        self.x = QtWidgets.QComboBox(self.centralwidget)
-        self.x.setCurrentIndex(-1)
+        #self.x = QtWidgets.QComboBox(self.centralwidget)
+        #self.x.setCurrentIndex(-1)
 
 
 if __name__ == "__main__":
