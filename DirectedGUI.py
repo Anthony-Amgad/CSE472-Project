@@ -180,28 +180,38 @@ class DGUi(QtWidgets.QMainWindow):
             self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : NULL, "Gs" : 0, "Hs" : next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"], "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
             self.choice = self.searchAlgoCom.currentIndex()
             match self.choice:
-                case 0:
+                case 0: #BFS
                     self.nextBtn.setDisabled(False)
+                    self.adNodeBtn.setDisabled(True)
+                    self.adEdgeBtn.setDisabled(True)
+                    self.delNodeBtn.setDisabled(True)
+                    self.delEdgeBtn.setDisabled(True)
+                    self.searchBtn.setDisabled(True)
                     self.onClickNext()
-                case 1:
+                case 1: #DFS
                     print("DFS")
-                case 2:
+                case 2: #IDS
                     print("IDS")
-                case 3:
+                case 3: #UCS
                     print("UCS")
-                case 4:
+                case 4: #GS
                     print("GS")
-                case 5:
+                case 5: #AS
                     print("AS")
 
     def onClickNext(self):
         match self.choice:
-            case 0:
+            case 0: #BFS
                 parent = self.fringe.pop(0)
                 self.expanded.append(parent)
                 if next(x for x in self.Nodes if x["name"] == parent)["goal"]:
                     self.reTree(True)
                     self.nextBtn.setDisabled(True)
+                    self.adNodeBtn.setDisabled(False)
+                    self.adEdgeBtn.setDisabled(False)
+                    self.delNodeBtn.setDisabled(False)
+                    self.delEdgeBtn.setDisabled(False)
+                    self.searchBtn.setDisabled(False)
                     self.fringe.clear()
                     self.expanded.clear()
                     self.treeNodes.clear()

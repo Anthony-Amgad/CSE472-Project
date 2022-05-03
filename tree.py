@@ -6,17 +6,16 @@ class TreePlot:
 
     def plot(treeNodes, expanded, found):
 
-        G = Network(height='100%', width='100%', layout=Tree)
+        G = Network(height='100%', width='100%', directed=True ,layout=Tree)
 
         for n in treeNodes:
-            if n["name"] not in expanded:
-                G.add_node(n["name"], n["name"] + " H:" + str(n["Hs"]) + " G:" + str(n["Gs"]), shape="ellipse")
-            else:
-                G.add_node(n["name"], n["name"] + " H:" + str(n["Hs"]) + " G:" + str(n["Gs"]), shape="ellipse", color= 'lime')
+            
+            G.add_node(n["name"], n["name"] + " H:" + str(n["Hs"]) + " G:" + str(n["Gs"]), shape="ellipse")
             if n["parent"] != NULL:
                 G.add_edge(n["parent"], n["name"])
 
-        
+        for n in expanded:
+            G.get_node(n)["color"] = 'lime'
 
         if found:
             G.get_node(expanded[-1])["color"] = 'yellow'
