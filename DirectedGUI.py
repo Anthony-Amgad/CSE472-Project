@@ -181,12 +181,7 @@ class DGUi(QtWidgets.QMainWindow):
             self.choice = self.searchAlgoCom.currentIndex()
             match self.choice:
                 case 0: #BFS
-                    self.nextBtn.setDisabled(False)
-                    self.adNodeBtn.setDisabled(True)
-                    self.adEdgeBtn.setDisabled(True)
-                    self.delNodeBtn.setDisabled(True)
-                    self.delEdgeBtn.setDisabled(True)
-                    self.searchBtn.setDisabled(True)
+                    self.inSearch(True)
                     self.reTree(False)
                 case 1: #DFS
                     print("DFS")
@@ -198,33 +193,69 @@ class DGUi(QtWidgets.QMainWindow):
                     print("GS")
                 case 5: #AS
                     print("AS")
+        else:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowIcon(QtGui.QIcon('error.png'))
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText('Make sure you chose a starting node and an algorithm')
+            msg.setWindowTitle("Error")
+            msg.exec_()
 
     def onClickNext(self):
         match self.choice:
             case 0: #BFS
-                parent = self.fringe.pop(0)
-                self.expanded.append(parent)
-                if next(x for x in self.Nodes if x["name"] == parent)["goal"]:
-                    self.reTree(True)
-                    self.nextBtn.setDisabled(True)
-                    self.adNodeBtn.setDisabled(False)
-                    self.adEdgeBtn.setDisabled(False)
-                    self.delNodeBtn.setDisabled(False)
-                    self.delEdgeBtn.setDisabled(False)
-                    self.searchBtn.setDisabled(False)
-                    self.fringe.clear()
-                    self.expanded.clear()
-                    self.treeNodes.clear()
+                if len(self.fringe) == 0:
+                    msg = QtWidgets.QMessageBox()
+                    msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                    msg.setIcon(QtWidgets.QMessageBox.Warning)
+                    msg.setText("A goal node cannot be reached")
+                    msg.setInformativeText('This starting node cannot reach a goal node')
+                    msg.setWindowTitle("Warning")
+                    msg.exec_()
+                    self.inSearch(False)
                 else:
-                    for child in self.AdjLi[parent]:
-                        if next((x for x in self.treeNodes if x["name"] == child), None) == None:
-                            self.fringe.append(child)
-                            eL = list(filter(lambda edge: (edge['from'] == parent) and (edge['to'] == child), self.Edges))
-                            gS = min(eL, key=lambda x:x['cost'])['cost'] + next(x for x in self.treeNodes if x["name"] == parent)['Gs']
-                            self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":next(x for x in self.Nodes if x["name"] == child)['heur'], "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
-                    self.reTree(False)   
+                    parent = self.fringe.pop(0)
+                    self.expanded.append(parent)
+                    if next(x for x in self.Nodes if x["name"] == parent)["goal"]:
+                        self.reTree(True)
+                        path = []
+                        pp = parent
+                        while pp != NULL:
+                            path.append(pp)
+                            pp = next(x for x in self.treeNodes if x["name"] == pp)["parent"]
+                        st = ""
+                        path.reverse()
+                        for p in path:
+                            st = st + p + " -> "
+                        st = st[:-3]
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowIcon(QtGui.QIcon('info.png'))
+                        msg.setIcon(QtWidgets.QMessageBox.Information)
+                        msg.setText("Node Path Discovered: ")
+                        msg.setInformativeText(st)
+                        msg.setWindowTitle("Path")
+                        msg.exec_()
+                        self.inSearch(False)
+                        self.fringe.clear()
+                        self.expanded.clear()
+                        self.treeNodes.clear()
+                    else:
+                        for child in self.AdjLi[parent]:
+                            if next((x for x in self.treeNodes if x["name"] == child), None) == None:
+                                self.fringe.append(child)
+                                eL = list(filter(lambda edge: (edge['from'] == parent) and (edge['to'] == child), self.Edges))
+                                gS = min(eL, key=lambda x:x['cost'])['cost'] + next(x for x in self.treeNodes if x["name"] == parent)['Gs']
+                                self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":next(x for x in self.Nodes if x["name"] == child)['heur'], "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                        self.reTree(False)   
                        
-
+    def inSearch(self, bool):
+        self.nextBtn.setDisabled(not bool)
+        self.adNodeBtn.setDisabled(bool)
+        self.adEdgeBtn.setDisabled(bool)
+        self.delNodeBtn.setDisabled(bool)
+        self.delEdgeBtn.setDisabled(bool)
+        self.searchBtn.setDisabled(bool)
 
     
     def __init__(self):
@@ -244,6 +275,7 @@ class DGUi(QtWidgets.QMainWindow):
         self.treeBrowser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
         self.treeBrowser.setGeometry(QtCore.QRect(560, 220, 551, 601))
         self.treeBrowser.setObjectName("treeBrowser")
+        self.reTree(False)
 
         self.nextBtn = QtWidgets.QPushButton(self.centralwidget)
         self.nextBtn.setGeometry(QtCore.QRect(1050, 230, 51, 31))
