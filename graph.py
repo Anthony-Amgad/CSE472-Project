@@ -1,7 +1,7 @@
 
 from pyvis.network import Network
 
-class Plot:
+class GraphPlot:
 
     def plot(Nodes, Edges, bool):
         G = Network(height='100%', width='100%', directed=bool)
@@ -35,10 +35,10 @@ class Plot:
         for e in Edges:
             G.add_edge(e["from"], e["to"], label = e["cost"])
 
-        G.save_graph("plot.html")
+        G.save_graph("graph.html")
 
     def plotDir(Nodes,Edges):
-        Plot.plot(Nodes, Edges, True)
+        GraphPlot.plot(Nodes, Edges, True)
         
 
 

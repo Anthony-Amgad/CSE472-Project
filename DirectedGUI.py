@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore, QtGui
 import sys
 import os.path
 
-from plot import Plot
+from graph import GraphPlot
 
 class DGUi(QtWidgets.QMainWindow):
 
@@ -10,8 +10,8 @@ class DGUi(QtWidgets.QMainWindow):
     Edges = []
 
     def reGraph(self):
-        Plot.plotDir(self.Nodes,self.Edges)
-        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("plot.html")))
+        GraphPlot.plotDir(self.Nodes,self.Edges)
+        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("graph.html")))
     
     def addNode(self):
         try:
