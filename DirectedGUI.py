@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from PyQt5 import QtWidgets, uic, QtWebEngineWidgets, QtCore, QtGui
 import sys
 import os.path
@@ -16,7 +15,7 @@ class DGUi(QtWidgets.QMainWindow):
     expanded = []
     treeNodes = []
     AdjLi = {}
-    choice = NULL
+    choice = None
 
     def reGraph(self):
         self.AdjLi = GraphPlot.plotDir(self.Nodes,self.Edges)
@@ -176,8 +175,8 @@ class DGUi(QtWidgets.QMainWindow):
 
     def onClickSearch(self):
         if (self.startNodeCom.currentIndex() != -1) and (self.searchAlgoCom.currentIndex() != -1):
-            self.fringe.append(self.startNodeCom.currentText())
-            self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : NULL, "Gs" : 0, "Hs" : next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"], "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
+            self.fringe.append(self.startNodeCom.currentText() + ":0")
+            self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"], "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
             self.choice = self.searchAlgoCom.currentIndex()
             match self.choice:
                 case 0: #BFS
@@ -217,13 +216,15 @@ class DGUi(QtWidgets.QMainWindow):
                 else:
                     parent = self.fringe.pop(0)
                     self.expanded.append(parent)
-                    if next(x for x in self.Nodes if x["name"] == parent)["goal"]:
+                    pn, pg = parent.split(":")
+                    if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
                         self.reTree(True)
                         path = []
                         pp = parent
-                        while pp != NULL:
-                            path.append(pp)
-                            pp = next(x for x in self.treeNodes if x["name"] == pp)["parent"]
+                        while pp != None:
+                            ppn, ppg = pp.split(":")
+                            path.append(ppn)
+                            pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == int(ppg))))["parent"]
                         st = ""
                         path.reverse()
                         for p in path:
@@ -241,12 +242,13 @@ class DGUi(QtWidgets.QMainWindow):
                         self.expanded.clear()
                         self.treeNodes.clear()
                     else:
-                        for child in self.AdjLi[parent]:
-                            if next((x for x in self.treeNodes if x["name"] == child), None) == None:
-                                self.fringe.append(child)
-                                eL = list(filter(lambda edge: (edge['from'] == parent) and (edge['to'] == child), self.Edges))
-                                gS = min(eL, key=lambda x:x['cost'])['cost'] + next(x for x in self.treeNodes if x["name"] == parent)['Gs']
-                                self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":next(x for x in self.Nodes if x["name"] == child)['heur'], "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                        for child in self.AdjLi[pn]:
+                            eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                            gS = min(eL, key=lambda x:x['cost'])['cost'] + int(pg)
+                            hS = next(x for x in self.Nodes if x["name"] == child)['heur']
+                            if (child + ":" + str(gS)) not in self.expanded:
+                                self.fringe.append(str(child + ":" + str(gS)))
+                                self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
                         self.reTree(False)   
                        
     def inSearch(self, bool):
