@@ -16,6 +16,8 @@ class DGUi(QtWidgets.QMainWindow):
     treeNodes = []
     AdjLi = {}
     choice = None
+    maxDep = None
+    #inDLS = 1
 
     def reGraph(self):
         self.AdjLi = GraphPlot.plotDir(self.Nodes,self.Edges)
@@ -179,6 +181,7 @@ class DGUi(QtWidgets.QMainWindow):
             self.fringe.append(self.startNodeCom.currentText() + ":0:" + str(temheur) + ":" + str(temheur))
             self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : temheur, "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
             self.choice = self.searchAlgoCom.currentIndex()
+            self.maxDep = self.maxDepth(self.startNodeCom.currentText())
             self.inSearch(True)
             self.reTree(False)
                 
@@ -203,6 +206,9 @@ class DGUi(QtWidgets.QMainWindow):
                     msg.setWindowTitle("Warning")
                     msg.exec_()
                     self.inSearch(False)
+                    self.fringe.clear()
+                    self.expanded.clear()
+                    self.treeNodes.clear()
                 else:
                     parent = self.fringe.pop(0)
                     self.expanded.append(parent)
@@ -250,6 +256,9 @@ class DGUi(QtWidgets.QMainWindow):
                         msg.setWindowTitle("Warning")
                         msg.exec_()
                         self.inSearch(False)
+                        self.fringe.clear()
+                        self.expanded.clear()
+                        self.treeNodes.clear()
                     else:
                         parent = self.fringe.pop(-1)
                         self.expanded.append(parent)
@@ -287,14 +296,189 @@ class DGUi(QtWidgets.QMainWindow):
                                     self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
                             self.reTree(False)
-            case 2: #IDS
-                    print("IDS")
+            case 2: #IDDFS
+                    #if self.inDLS > 0 and self.inDLS <= self.maxDep: ##This was a trial bas da hayb2a ar5am wa7ed 8aleban
+                    print(self.maxDep)
             case 3: #UCS
-                    print("UCS")
+                    if len(self.fringe) == 0:
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setIcon(QtWidgets.QMessageBox.Warning)
+                        msg.setText("A goal node cannot be reached")
+                        msg.setInformativeText('This starting node cannot reach a goal node')
+                        msg.setWindowTitle("Warning")
+                        msg.exec_()
+                        self.inSearch(False)
+                        self.fringe.clear()
+                        self.expanded.clear()
+                        self.treeNodes.clear()
+                    else:
+                        parent = self.fringe.pop(0)
+                        self.expanded.append(parent)
+                        pn, pg, ph, pt = parent.split(":")
+                        if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
+                            self.reTree(True)
+                            path = []
+                            pp = parent
+                            while pp != None:
+                                ppn, ppg, pph, ppt = pp.split(":")
+                                path.append(ppn)
+                                pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
+                            st = ""
+                            path.reverse()
+                            for p in path:
+                                st = st + p + " -> "
+                            st = st[:-3]
+                            msg = QtWidgets.QMessageBox()
+                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setIcon(QtWidgets.QMessageBox.Information)
+                            msg.setText("Node Path Discovered: ")
+                            msg.setInformativeText(st)
+                            msg.setWindowTitle("Path")
+                            msg.exec_()
+                            self.inSearch(False)
+                            self.fringe.clear()
+                            self.expanded.clear()
+                            self.treeNodes.clear()
+                        else:
+                            for child in self.AdjLi[pn]:
+                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
+                                hS = next(x for x in self.Nodes if x["name"] == child)['heur']
+                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS)) not in self.expanded:
+                                    ff = True
+                                    for i in range(0,len(self.fringe)):
+                                        iin,iig,iih,iit = self.fringe[i].split(":")
+                                        if float(iig) > gS:
+                                            self.fringe.insert(i,child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                            ff = False
+                                            break
+                                    if ff :
+                                        self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                    self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                            self.reTree(False)
             case 4: #GS
-                    print("GS")
+                    if len(self.fringe) == 0:
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setIcon(QtWidgets.QMessageBox.Warning)
+                        msg.setText("A goal node cannot be reached")
+                        msg.setInformativeText('This starting node cannot reach a goal node')
+                        msg.setWindowTitle("Warning")
+                        msg.exec_()
+                        self.inSearch(False)
+                        self.fringe.clear()
+                        self.expanded.clear()
+                        self.treeNodes.clear()
+                    else:
+                        parent = self.fringe.pop(0)
+                        self.expanded.append(parent)
+                        pn, pg, ph, pt = parent.split(":")
+                        if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
+                            self.reTree(True)
+                            path = []
+                            pp = parent
+                            while pp != None:
+                                ppn, ppg, pph, ppt = pp.split(":")
+                                path.append(ppn)
+                                pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
+                            st = ""
+                            path.reverse()
+                            for p in path:
+                                st = st + p + " -> "
+                            st = st[:-3]
+                            msg = QtWidgets.QMessageBox()
+                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setIcon(QtWidgets.QMessageBox.Information)
+                            msg.setText("Node Path Discovered: ")
+                            msg.setInformativeText(st)
+                            msg.setWindowTitle("Path")
+                            msg.exec_()
+                            self.inSearch(False)
+                            self.fringe.clear()
+                            self.expanded.clear()
+                            self.treeNodes.clear()
+                        else:
+                            for child in self.AdjLi[pn]:
+                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
+                                hS = next(x for x in self.Nodes if x["name"] == child)['heur']
+                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS)) not in self.expanded:
+                                    ff = True
+                                    for i in range(0,len(self.fringe)):
+                                        iin,iig,iih,iit = self.fringe[i].split(":")
+                                        if float(iih) > gS:
+                                            self.fringe.insert(i,child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                            ff = False
+                                            break
+                                    if ff :
+                                        self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                    self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                            self.reTree(False)
             case 5: #A*S
-                    print("A*S")   
+                    if len(self.fringe) == 0:
+                        msg = QtWidgets.QMessageBox()
+                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setIcon(QtWidgets.QMessageBox.Warning)
+                        msg.setText("A goal node cannot be reached")
+                        msg.setInformativeText('This starting node cannot reach a goal node')
+                        msg.setWindowTitle("Warning")
+                        msg.exec_()
+                        self.inSearch(False)
+                        self.fringe.clear()
+                        self.expanded.clear()
+                        self.treeNodes.clear()
+                    else:
+                        parent = self.fringe.pop(0)
+                        self.expanded.append(parent)
+                        pn, pg, ph, pt = parent.split(":")
+                        if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
+                            self.reTree(True)
+                            path = []
+                            pp = parent
+                            while pp != None:
+                                ppn, ppg, pph, ppt = pp.split(":")
+                                path.append(ppn)
+                                pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
+                            st = ""
+                            path.reverse()
+                            for p in path:
+                                st = st + p + " -> "
+                            st = st[:-3]
+                            msg = QtWidgets.QMessageBox()
+                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setIcon(QtWidgets.QMessageBox.Information)
+                            msg.setText("Node Path Discovered: ")
+                            msg.setInformativeText(st)
+                            msg.setWindowTitle("Path")
+                            msg.exec_()
+                            self.inSearch(False)
+                            self.fringe.clear()
+                            self.expanded.clear()
+                            self.treeNodes.clear()
+                        else:
+                            for child in self.AdjLi[pn]:
+                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
+                                hS = next(x for x in self.Nodes if x["name"] == child)['heur']
+                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS)) not in self.expanded:
+                                    ff = True
+                                    for i in range(0,len(self.fringe)):
+                                        iin,iig,iih,iit = self.fringe[i].split(":")
+                                        if float(iit) > gS:
+                                            self.fringe.insert(i,child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                            ff = False
+                                            break
+                                    if ff :
+                                        self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
+                                    self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
+                            self.reTree(False) 
+
+    def maxDepth(self,st):
+        children = [0]
+        for child in self.AdjLi[st]:
+                children.append(self.maxDepth(child))
+        return max(children) + 1
                        
     def inSearch(self, bool):
         self.nextBtn.setDisabled(not bool)
