@@ -6,7 +6,7 @@ from graph import GraphPlot
 from tree import TreePlot
 
 
-class DGUi(QtWidgets.QMainWindow):
+class UGUi(QtWidgets.QMainWindow):
 
     Nodes = []
     Edges = []
@@ -14,13 +14,14 @@ class DGUi(QtWidgets.QMainWindow):
     fringe = []
     expanded = []
     treeNodes = []
+    temtree = []
     AdjLi = {}
     choice = None
     maxDep = None
     curDLS = 1
 
     def reGraph(self):
-        self.AdjLi = GraphPlot.plotDir(self.Nodes,self.Edges)
+        self.AdjLi = GraphPlot.plotUnDir(self.Nodes,self.Edges)
         self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("graph.html")))
 
     def reTree(self, found):
@@ -100,7 +101,7 @@ class DGUi(QtWidgets.QMainWindow):
                 if eC < 0:
                     raise Exception("No Negative Numbers")
                 self.Edges.append({"from":self.fromEdAddCom.currentText(),"to":self.toEdAddCom.currentText(),"cost":eC})
-                self.delEdCom.addItem(self.fromEdAddCom.currentText() + " > " + self.toEdAddCom.currentText() + " : " + str(eC))
+                self.delEdCom.addItem(self.fromEdAddCom.currentText() + " - " + self.toEdAddCom.currentText() + " : " + str(eC))
                 self.fromEdAddCom.setCurrentIndex(-1)
                 self.toEdAddCom.setCurrentIndex(-1)
                 self.edPathCTxt.setText("")
@@ -144,7 +145,7 @@ class DGUi(QtWidgets.QMainWindow):
                     self.searchBtn.setDisabled(True)
             dEc = [self.delEdCom.itemText(i) for i in range(self.delEdCom.count())]
             for i in range(0,len(dEc)):
-                Ef, Et = dEc[i].split('>')
+                Ef, Et = dEc[i].split('-')
                 Ef.strip()
                 Et, Ec = Et.split(':')
                 Et.strip()
@@ -181,7 +182,6 @@ class DGUi(QtWidgets.QMainWindow):
             self.fringe.append(self.startNodeCom.currentText() + ":0:" + str(temheur) + ":1")
             self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : temheur, "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"], "hi":1})
             self.choice = self.searchAlgoCom.currentIndex()
-            self.maxDep = self.maxDepth(self.startNodeCom.currentText())
             self.curDLS = 1
             self.inSearch(True)
             self.reTree(False)
@@ -240,11 +240,11 @@ class DGUi(QtWidgets.QMainWindow):
                         self.treeNodes.clear()
                     else:
                         for child in self.AdjLi[pn]:
-                            eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                            eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                             gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                             hI = int(pt) + 1
                             hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                            if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                            if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                 self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                 self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'] ,"hi":hI})
                         self.reTree(False)
@@ -291,16 +291,16 @@ class DGUi(QtWidgets.QMainWindow):
                             self.treeNodes.clear()
                         else:
                             for child in self.AdjLi[pn]:
-                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
                             self.reTree(False)
             case 2: #IDDFS
-                    if (len(self.fringe) == 0) and (self.maxDep <= self.curDLS):
+                    if (len(self.fringe) == 0) and (self.temtree == self.treeNodes):
                         msg = QtWidgets.QMessageBox()
                         msg.setWindowIcon(QtGui.QIcon('warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
@@ -313,6 +313,7 @@ class DGUi(QtWidgets.QMainWindow):
                         self.expanded.clear()
                         self.treeNodes.clear()
                     elif len(self.fringe) == 0:
+                        self.temtree = self.treeNodes.copy()
                         self.expanded.clear()
                         tem = self.treeNodes[0]
                         self.treeNodes.clear()
@@ -350,11 +351,11 @@ class DGUi(QtWidgets.QMainWindow):
                             self.treeNodes.clear()
                         else:
                             for child in self.AdjLi[pn]:
-                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     if hI <= self.curDLS:
                                         self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                         self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
@@ -402,11 +403,11 @@ class DGUi(QtWidgets.QMainWindow):
                             self.treeNodes.clear()
                         else:
                             for child in self.AdjLi[pn]:
-                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -461,11 +462,11 @@ class DGUi(QtWidgets.QMainWindow):
                             self.treeNodes.clear()
                         else:
                             for child in self.AdjLi[pn]:
-                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -520,11 +521,11 @@ class DGUi(QtWidgets.QMainWindow):
                             self.treeNodes.clear()
                         else:
                             for child in self.AdjLi[pn]:
-                                eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
+                                eL = list(filter(lambda edge: ((edge['from'] == pn) and (edge['to'] == child)) or ((edge['to'] == pn) and (edge['from'] == child)), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -537,11 +538,6 @@ class DGUi(QtWidgets.QMainWindow):
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
                             self.reTree(False) 
 
-    def maxDepth(self,st):
-        children = [0]
-        for child in self.AdjLi[st]:
-                children.append(self.maxDepth(child))
-        return max(children) + 1
                        
     def inSearch(self, bool):
         self.nextBtn.setDisabled(not bool)
@@ -553,7 +549,7 @@ class DGUi(QtWidgets.QMainWindow):
 
     
     def __init__(self):
-        super(DGUi,self).__init__()
+        super(UGUi,self).__init__()
         uic.loadUi('GraphingWindow.ui',self)
 
         self.Nodes = []
@@ -562,14 +558,14 @@ class DGUi(QtWidgets.QMainWindow):
         self.fringe = []
         self.expanded = []
         self.treeNodes = []
+        self.temtree = []
         self.AdjLi = {}
         self.choice = None
         self.maxDep = None
         self.curDLS = 1
 
         self.setWindowIcon(QtGui.QIcon('img.png'))
-        self.setWindowTitle("Directed Graph")
-
+        self.setWindowTitle("Undirected Graph")
 
         self.setFixedSize(1112, 858)
         
@@ -589,8 +585,8 @@ class DGUi(QtWidgets.QMainWindow):
         self.nextBtn.setText("Next")
         self.nextBtn.setDisabled(True) 
 
-        self.fromEdAddCom.lineEdit().setPlaceholderText("From")
-        self.toEdAddCom.lineEdit().setPlaceholderText("To")
+        self.fromEdAddCom.lineEdit().setPlaceholderText("First Node")
+        self.toEdAddCom.lineEdit().setPlaceholderText("Second Node")
         self.delEdCom.lineEdit().setPlaceholderText("Pick an Edge to Delete")
         self.delNodeCom.lineEdit().setPlaceholderText("Pick a Node to Delete")
         self.startNodeCom.lineEdit().setPlaceholderText("Pick a Starting Node")
@@ -621,5 +617,5 @@ class DGUi(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = DGUi()
+    window = UGUi()
     app.exec_()

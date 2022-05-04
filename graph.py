@@ -40,6 +40,9 @@ class GraphPlot:
 
     def plotDir(Nodes,Edges):
         return GraphPlot.plot(Nodes, Edges, True)
+
+    def plotUnDir(Nodes,Edges):
+        return GraphPlot.plot(Nodes, Edges, False)
         
 
 

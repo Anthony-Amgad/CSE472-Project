@@ -22,7 +22,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Directed Graph</string>
+   <string/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLineEdit" name="nodeNameTxt">

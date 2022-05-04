@@ -2,12 +2,15 @@ from PyQt5 import QtWidgets, uic, QtGui
 import sys
 
 from DirectedGUI import DGUi
+from UndirectedGUI import UGUi
 
 class MUi(QtWidgets.QMainWindow):
     def openDirectedWindow(self):
         self.ui = DGUi()
-        
 
+    def openUnDirectedWindow(self):
+        self.ui = UGUi()
+        
     def __init__(self):
         super(MUi,self).__init__()
         uic.loadUi('MainWindow.ui',self)
@@ -17,6 +20,7 @@ class MUi(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon('img.png'))
 
         self.dirPushBut.clicked.connect(self.openDirectedWindow)
+        self.undirPushBut.clicked.connect(self.openUnDirectedWindow)
 
         self.show()
 
