@@ -175,8 +175,9 @@ class DGUi(QtWidgets.QMainWindow):
 
     def onClickSearch(self):
         if (self.startNodeCom.currentIndex() != -1) and (self.searchAlgoCom.currentIndex() != -1):
-            self.fringe.append(self.startNodeCom.currentText() + ":0")
-            self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"], "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
+            temheur = next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["heur"]
+            self.fringe.append(self.startNodeCom.currentText() + ":0:" + str(temheur) + ":" + str(temheur))
+            self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : temheur, "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"]})
             self.choice = self.searchAlgoCom.currentIndex()
             self.inSearch(True)
             self.reTree(False)
@@ -205,13 +206,13 @@ class DGUi(QtWidgets.QMainWindow):
                 else:
                     parent = self.fringe.pop(0)
                     self.expanded.append(parent)
-                    pn, pg = parent.split(":")
+                    pn, pg, ph, pt = parent.split(":")
                     if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
                         self.reTree(True)
                         path = []
                         pp = parent
                         while pp != None:
-                            ppn, ppg = pp.split(":")
+                            ppn, ppg, pph, ppt = pp.split(":")
                             path.append(ppn)
                             pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
                         st = ""
@@ -235,12 +236,11 @@ class DGUi(QtWidgets.QMainWindow):
                             eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
                             gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                             hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                            if (child + ":" + str(gS)) not in self.expanded:
-                                self.fringe.append(str(child + ":" + str(gS)))
+                            if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS)) not in self.expanded:
+                                self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
                                 self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
                         self.reTree(False)
             case 1: #DFS
-                    print("DFS")
                     if len(self.fringe) == 0:
                         msg = QtWidgets.QMessageBox()
                         msg.setWindowIcon(QtGui.QIcon('warning.png'))
@@ -253,13 +253,13 @@ class DGUi(QtWidgets.QMainWindow):
                     else:
                         parent = self.fringe.pop(-1)
                         self.expanded.append(parent)
-                        pn, pg = parent.split(":")
+                        pn, pg, ph, pt = parent.split(":")
                         if next(x for x in self.Nodes if x["name"] == pn)["goal"]:
                             self.reTree(True)
                             path = []
                             pp = parent
                             while pp != None:
-                                ppn, ppg = pp.split(":")
+                                ppn, ppg, pph, ppt = pp.split(":")
                                 path.append(ppn)
                                 pp = next(x for x in self.treeNodes if ((x["name"] == ppn) and (x["Gs"] == float(ppg))))["parent"]
                             st = ""
@@ -283,8 +283,8 @@ class DGUi(QtWidgets.QMainWindow):
                                 eL = list(filter(lambda edge: (edge['from'] == pn) and (edge['to'] == child), self.Edges))
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS)) not in self.expanded:
-                                    self.fringe.append(str(child + ":" + str(gS)))
+                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS)) not in self.expanded:
+                                    self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(gS+hS))
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal']})
                             self.reTree(False)
             case 2: #IDS
@@ -293,8 +293,8 @@ class DGUi(QtWidgets.QMainWindow):
                     print("UCS")
             case 4: #GS
                     print("GS")
-            case 5: #AS
-                    print("AS")   
+            case 5: #A*S
+                    print("A*S")   
                        
     def inSearch(self, bool):
         self.nextBtn.setDisabled(not bool)

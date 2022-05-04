@@ -9,9 +9,9 @@ class TreePlot:
 
         for n in treeNodes:
             
-            G.add_node(n["name"]+":"+str(n["Gs"]), n["name"] + " ( G:" + str(n["Gs"]) + " H:" + str(n["Hs"]) + " )", shape="ellipse")
+            G.add_node(n["name"]+":"+str(n["Gs"])+":"+str(n["Hs"])+":"+str(n["Gs"] + n["Hs"]) , n["name"] + " ( G:" + str(n["Gs"]) + " H:" + str(n["Hs"]) + " )", shape="ellipse")
             if n["parent"] != None:
-                G.add_edge(n["parent"], n["name"]+":"+str(n["Gs"]))
+                G.add_edge(n["parent"], n["name"]+":"+str(n["Gs"])+":"+str(n["Hs"])+":"+str(n["Gs"] + n["Hs"]))
 
         for n in expanded:
             G.get_node(n)["color"] = 'lime'
