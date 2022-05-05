@@ -17,7 +17,6 @@ class UGUi(QtWidgets.QMainWindow):
     temtree = []
     AdjLi = {}
     choice = None
-    maxDep = None
     curDLS = 1
 
     def reGraph(self):

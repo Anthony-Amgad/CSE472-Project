@@ -14,9 +14,9 @@ class DGUi(QtWidgets.QMainWindow):
     fringe = []
     expanded = []
     treeNodes = []
+    temtree = []
     AdjLi = {}
     choice = None
-    maxDep = None
     curDLS = 1
 
     def reGraph(self):
@@ -181,7 +181,6 @@ class DGUi(QtWidgets.QMainWindow):
             self.fringe.append(self.startNodeCom.currentText() + ":0:" + str(temheur) + ":1")
             self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : temheur, "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"], "hi":1})
             self.choice = self.searchAlgoCom.currentIndex()
-            self.maxDep = self.maxDepth(self.startNodeCom.currentText())
             self.curDLS = 1
             self.inSearch(True)
             self.reTree(False)
@@ -244,7 +243,7 @@ class DGUi(QtWidgets.QMainWindow):
                             gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                             hI = int(pt) + 1
                             hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                            if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                            if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                 self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                 self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'] ,"hi":hI})
                         self.reTree(False)
@@ -295,12 +294,12 @@ class DGUi(QtWidgets.QMainWindow):
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
                             self.reTree(False)
             case 2: #IDDFS
-                    if (len(self.fringe) == 0) and (self.maxDep <= self.curDLS):
+                    if (len(self.fringe) == 0) and (self.temtree == self.treeNodes):
                         msg = QtWidgets.QMessageBox()
                         msg.setWindowIcon(QtGui.QIcon('warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
@@ -313,6 +312,7 @@ class DGUi(QtWidgets.QMainWindow):
                         self.expanded.clear()
                         self.treeNodes.clear()
                     elif len(self.fringe) == 0:
+                        self.temtree = self.treeNodes.copy()
                         self.expanded.clear()
                         tem = self.treeNodes[0]
                         self.treeNodes.clear()
@@ -354,7 +354,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     if hI <= self.curDLS:
                                         self.fringe.append(child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI))
                                         self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
@@ -406,7 +406,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -465,7 +465,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -524,7 +524,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 gS = min(eL, key=lambda x:x['cost'])['cost'] + float(pg)
                                 hI = int(pt) + 1
                                 hS = next(x for x in self.Nodes if x["name"] == child)['heur']
-                                if (child + ":" + str(gS) + ":" + str(hS) + ":" + str(hI)) not in self.expanded:
+                                if not any((ele.find(child + ":") != -1) and (ele.find(":" + str(hS) + ":") != -1) for ele in self.expanded):
                                     ff = True
                                     for i in range(0,len(self.fringe)):
                                         iin,iig,iih,iit = self.fringe[i].split(":")
@@ -537,11 +537,6 @@ class DGUi(QtWidgets.QMainWindow):
                                     self.treeNodes.append({"name":child,"parent":parent,"Gs":gS,"Hs":hS, "goal":next(x for x in self.Nodes if x["name"] == child)['goal'], "hi":hI})
                             self.reTree(False) 
 
-    def maxDepth(self,st):
-        children = [0]
-        for child in self.AdjLi[st]:
-                children.append(self.maxDepth(child))
-        return max(children) + 1
                        
     def inSearch(self, bool):
         self.nextBtn.setDisabled(not bool)
