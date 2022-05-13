@@ -21,17 +21,17 @@ class DGUi(QtWidgets.QMainWindow):
 
     def reGraph(self):
         self.AdjLi = GraphPlot.plotDir(self.Nodes,self.Edges)
-        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("graph.html")))
+        self.graphBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("rec/graph.html")))
 
     def reTree(self, found):
         TreePlot.plot(self.treeNodes, self.expanded, found)
-        self.treeBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("tree.html")))
+        self.treeBrowser.load(QtCore.QUrl.fromLocalFile(os.path.abspath("rec/tree.html")))
     
     def addNode(self):
         try:
             if next((x for x in self.Nodes if x["name"] == self.nodeNameTxt.text()), None)  != None:
                 msg = QtWidgets.QMessageBox()
-                msg.setWindowIcon(QtGui.QIcon('error.png'))
+                msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
                 msg.setText("Error")
                 msg.setInformativeText('Please Enter Unique Node Name')
@@ -39,7 +39,7 @@ class DGUi(QtWidgets.QMainWindow):
                 msg.exec_()
             elif self.nodeNameTxt.text() == "":
                 msg = QtWidgets.QMessageBox()
-                msg.setWindowIcon(QtGui.QIcon('error.png'))
+                msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
                 msg.setText("Error")
                 msg.setInformativeText('Please Make sure the Node Name is entered')
@@ -73,7 +73,7 @@ class DGUi(QtWidgets.QMainWindow):
 
         except:
             msg = QtWidgets.QMessageBox()
-            msg.setWindowIcon(QtGui.QIcon('error.png'))
+            msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setText("Error")
             msg.setInformativeText('Please check that Node Heuristic is valid')
@@ -85,7 +85,7 @@ class DGUi(QtWidgets.QMainWindow):
         try:
             if (self.fromEdAddCom.currentIndex() == -1) or (self.toEdAddCom.currentIndex() == -1):
                 msg = QtWidgets.QMessageBox()
-                msg.setWindowIcon(QtGui.QIcon('error.png'))
+                msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
                 msg.setText("Error")
                 msg.setInformativeText('Please Make sure both a from and to Node are selected')
@@ -108,7 +108,7 @@ class DGUi(QtWidgets.QMainWindow):
 
         except:
             msg = QtWidgets.QMessageBox()
-            msg.setWindowIcon(QtGui.QIcon('error.png'))
+            msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setText("Error")
             msg.setInformativeText('Please check that Edge Path Cost is valid')
@@ -182,12 +182,13 @@ class DGUi(QtWidgets.QMainWindow):
             self.treeNodes.append({"name" : self.startNodeCom.currentText(), "parent" : None, "Gs" : 0, "Hs" : temheur, "goal":next(x for x in self.Nodes if x["name"] == self.startNodeCom.currentText())["goal"], "hi":1})
             self.choice = self.searchAlgoCom.currentIndex()
             self.curDLS = 1
+            self.temtree = []
             self.inSearch(True)
             self.reTree(False)
                 
         else:
             msg = QtWidgets.QMessageBox()
-            msg.setWindowIcon(QtGui.QIcon('error.png'))
+            msg.setWindowIcon(QtGui.QIcon('rec/error.png'))
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setText("Error")
             msg.setInformativeText('Make sure you chose a starting node and an algorithm')
@@ -199,7 +200,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 0: #BFS
                 if len(self.fringe) == 0:
                     msg = QtWidgets.QMessageBox()
-                    msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                    msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                     msg.setIcon(QtWidgets.QMessageBox.Warning)
                     msg.setText("A goal node cannot be reached")
                     msg.setInformativeText('This starting node cannot reach a goal node')
@@ -227,7 +228,7 @@ class DGUi(QtWidgets.QMainWindow):
                             st = st + p + " -> "
                         st = st[:-3]
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('info.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Information)
                         msg.setText("Node Path Discovered: ")
                         msg.setInformativeText(st)
@@ -250,7 +251,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 1: #DFS
                     if len(self.fringe) == 0:
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
                         msg.setText("A goal node cannot be reached")
                         msg.setInformativeText('This starting node cannot reach a goal node')
@@ -278,7 +279,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 st = st + p + " -> "
                             st = st[:-3]
                             msg = QtWidgets.QMessageBox()
-                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                             msg.setIcon(QtWidgets.QMessageBox.Information)
                             msg.setText("Node Path Discovered: ")
                             msg.setInformativeText(st)
@@ -301,7 +302,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 2: #IDDFS
                     if (len(self.fringe) == 0) and (self.temtree == self.treeNodes):
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
                         msg.setText("A goal node cannot be reached")
                         msg.setInformativeText('This starting node cannot reach a goal node')
@@ -338,7 +339,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 st = st + p + " -> "
                             st = st[:-3]
                             msg = QtWidgets.QMessageBox()
-                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                             msg.setIcon(QtWidgets.QMessageBox.Information)
                             msg.setText("Node Path Discovered: ")
                             msg.setInformativeText(st)
@@ -362,7 +363,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 3: #UCS
                     if len(self.fringe) == 0:
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
                         msg.setText("A goal node cannot be reached")
                         msg.setInformativeText('This starting node cannot reach a goal node')
@@ -390,7 +391,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 st = st + p + " -> "
                             st = st[:-3]
                             msg = QtWidgets.QMessageBox()
-                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                             msg.setIcon(QtWidgets.QMessageBox.Information)
                             msg.setText("Node Path Discovered: ")
                             msg.setInformativeText(st)
@@ -421,7 +422,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 4: #GS
                     if len(self.fringe) == 0:
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
                         msg.setText("A goal node cannot be reached")
                         msg.setInformativeText('This starting node cannot reach a goal node')
@@ -449,7 +450,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 st = st + p + " -> "
                             st = st[:-3]
                             msg = QtWidgets.QMessageBox()
-                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                             msg.setIcon(QtWidgets.QMessageBox.Information)
                             msg.setText("Node Path Discovered: ")
                             msg.setInformativeText(st)
@@ -480,7 +481,7 @@ class DGUi(QtWidgets.QMainWindow):
             case 5: #A*S
                     if len(self.fringe) == 0:
                         msg = QtWidgets.QMessageBox()
-                        msg.setWindowIcon(QtGui.QIcon('warning.png'))
+                        msg.setWindowIcon(QtGui.QIcon('rec/warning.png'))
                         msg.setIcon(QtWidgets.QMessageBox.Warning)
                         msg.setText("A goal node cannot be reached")
                         msg.setInformativeText('This starting node cannot reach a goal node')
@@ -508,7 +509,7 @@ class DGUi(QtWidgets.QMainWindow):
                                 st = st + p + " -> "
                             st = st[:-3]
                             msg = QtWidgets.QMessageBox()
-                            msg.setWindowIcon(QtGui.QIcon('info.png'))
+                            msg.setWindowIcon(QtGui.QIcon('rec/info.png'))
                             msg.setIcon(QtWidgets.QMessageBox.Information)
                             msg.setText("Node Path Discovered: ")
                             msg.setInformativeText(st)
@@ -549,7 +550,7 @@ class DGUi(QtWidgets.QMainWindow):
     
     def __init__(self):
         super(DGUi,self).__init__()
-        uic.loadUi('GraphingWindow.ui',self)
+        uic.loadUi('rec/GraphingWindow.ui',self)
 
         self.Nodes = []
         self.Edges = []
@@ -562,7 +563,7 @@ class DGUi(QtWidgets.QMainWindow):
         self.maxDep = None
         self.curDLS = 1
 
-        self.setWindowIcon(QtGui.QIcon('img.png'))
+        self.setWindowIcon(QtGui.QIcon('rec/img.png'))
         self.setWindowTitle("Directed Graph")
 
 

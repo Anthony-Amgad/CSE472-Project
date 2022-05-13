@@ -35,7 +35,7 @@ class GraphPlot:
         for e in Edges:
             G.add_edge(e["from"], e["to"], label = e["cost"])
 
-        G.save_graph("graph.html")
+        G.save_graph("rec/graph.html")
         return G.get_adj_list()
 
     def plotDir(Nodes,Edges):
