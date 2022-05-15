@@ -20,4 +20,4 @@ class TreePlot:
         if found:
             G.get_node(expanded[-1])["color"] = 'yellow'
 
-        G.save_graph("rec/tree.html")
+        G.save_graph("res/tree.html")

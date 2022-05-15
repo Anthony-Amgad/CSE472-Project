@@ -13,11 +13,11 @@ class MUi(QtWidgets.QMainWindow):
         
     def __init__(self):
         super(MUi,self).__init__()
-        uic.loadUi('rec/MainWindow.ui',self)
+        uic.loadUi('res/MainWindow.ui',self)
 
         self.setFixedSize(804, 156)
 
-        self.setWindowIcon(QtGui.QIcon('rec/img.png'))
+        self.setWindowIcon(QtGui.QIcon('res/img.png'))
 
         self.dirPushBut.clicked.connect(self.openDirectedWindow)
         self.undirPushBut.clicked.connect(self.openUnDirectedWindow)
